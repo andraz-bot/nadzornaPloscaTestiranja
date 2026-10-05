@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <title>Nadzorna plošča testiranja</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- UVODNI MODAL OB PRVEM ZAGONU -->
+<div id="tutorial-overlay">
+    <div class="tutorial-box">
+        <h2 id="tutorial-title">Dobrodošli!</h2>
+        <p id="tutorial-text">Prikazali vam bomo hiter vodič po aplikaciji, da boste takoj vedeli, kako enostavno zagnati in spremljati teste.</p>
+        <div class="tutorial-buttons">
+            <button class="btn-secondary" onclick="skipTutorial()">Preskoči</button>
+            <button class="btn-run" style="width: auto; padding: 6px 16px;" onclick="nextTutorialStep()" id="tutorial-next-btn">Naprej</button>
+        </div>
+    </div>
+</div>
+
+<div id="tutorial-tooltip" style="display: none; position: absolute; z-index: 10003; background: #0f172a; border: 1px solid var(--primary); padding: 15px; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-width: 420px; color: white;"></div>
+
+<!-- NAVIGACIJSKA VRSTICA -->
+<div class="navbar">
+    <div class="nav-brand" style="flex-direction: column; align-items: flex-start; gap: 2px;" id="tutorial-step-header">
+        <div style="font-size: 15px; font-weight: bold; color: var(--text-main);">Nadzorna plošča testiranja</div>
+        <div style="font-size: 10px; color: var(--text-muted); font-weight: normal;">Preprosto okolje za zagon, spremljanje in analizo testov</div>
+    </div>
+    <div class="nav-links" id="tutorial-step-nav">
+        <button class="nav-btn active" onclick="switchView('view-dashboard', this)">Testi</button>
+        <button class="nav-btn" onclick="switchView('view-history', this)">Zgodovina</button>
+        <button class="nav-btn" onclick="switchView('view-settings', this)">Nastavitve</button>
+        <button class="nav-btn" onclick="switchView('view-help', this)">Pomoč</button>
+    </div>
+    <div>
+        <button class="nav-auth-btn" onclick="switchView('view-auth', this)" id="tutorial-step-auth">Prijava</button>
+    </div>
+</div>
+
+<!-- 1. POGLED: GLAVNA NADZORNA PLOŠČA -->
+<div id="view-dashboard" class="app-view active-view">
+    <div class="main-layout">
+        <!-- LEVI STOLPEC -->
+        <div class="sidebar">
+            <!-- Dinamična vertikalna nit (pipeline) -->
+            <div class="sidebar-pipeline-fill" id="sidebar-pipeline-fill"></div>
+
+            <!-- 1. Korak -->
+            <div class="card" id="tutorial-step-1">
+                <h3 id="lbl-step1">1. Dodaj projekt</h3>
+                <div id="drop-zone" style="padding: 16px;">
+                    <span style="font-size: 22px;">📦</span>
+                    <div style="font-weight: bold; margin-top: 4px; font-size: 12px;" id="lbl-drop-text">Izberi ZIP ali mapo</div>
+                    <p style="font-size: 11px; margin: 4px 0 0 0;">Spusti vsebino tukaj</p>
+                    <input type="file" id="file-input" style="display: none;">
+                </div>
+            </div>
+
+            <!-- Velik glavni napredovalni trak med 1. in 2. korakom -->
+            <div class="grand-pipeline-bar"><div class="grand-pipeline-fill" id="grand-progress-1"></div></div>
+
+            <!-- 2. Korak -->
+            <div class="card" id="tutorial-step-2">
+                <h3 id="lbl-step2">2. Naloženi projekti</h3>
+                <div class="project-list" id="project-list-container" style="max-height: 120px; overflow-y: auto;">
+                    <div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 6px;" id="lbl-empty-list">Seznam je prazen...</div>
+                </div>
+            </div>
+
+            <!-- Velik glavni napredovalni trak med 2. in 3. korakom -->
+            <div class="grand-pipeline-bar"><div class="grand-pipeline-fill" id="grand-progress-2"></div></div>
+
+            <!-- 3. Korak: AKTIVNOST & STESTIRANI PROJEKTI -->
+            <div class="card" id="tutorial-step-3">
+                <h3 id="lbl-step3">3. AKTIVNOST</h3>
+                <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;" id="lbl-active-projects-subtitle">Aktivni projekti</div>
+
+                <div id="activity-drop-zone" style="border: 2px dashed var(--border); padding: 12px; border-radius: 6px; text-align: center; margin-bottom: 10px; background: var(--bg-input); transition: 0.2s;">
+                    <span style="font-size: 16px;">⚡</span>
+                    <div id="active-project-label" style="font-size: 10px; color: var(--text-muted); margin-top: 4px;">
+                        Sem povlecite projekt za dodajanje v aktivnost
+                    </div>
+                </div>
+
+                <div id="active-projects-list-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; margin-bottom: 12px;">
+                    <div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 8px;">Ni aktivnih projektov...</div>
+                </div>
+
+                <!-- Splošni napredek -->
+                <div class="progress-container" id="progress-container" style="display: none; margin-bottom: 10px;">
+                    <div class="progress-info-row" style="font-size: 11px;">
+                        <span id="progress-status-text">Poteka testiranje...</span>
+                        <span id="progress-percent-text">0%</span>
+                    </div>
+                    <div class="progress-bar-bg" style="height: 8px;">
+                        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                    </div>
+                </div>
+
+                <!-- Pod-razdelek: Stestirani projekti in poročila -->
+                <div style="border-top: 1px solid var(--border); margin-top: 12px; padding-top: 12px;">
+                    <h4 style="font-size: 12px; color: var(--primary); margin: 0 0 8px 0;">Stestirani projekti in poročila</h4>
+                    <div id="completed-projects-list-container" style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto;">
+                        <div style="font-size: 11px; color: var(--text-muted); text-align: center; padding: 6px;">Ni stestiranih projektov...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DESNI STOLPEC: Konzola v živo -->
+        <div class="console-card visible" id="console-card-container">
+            <div class="console-header">
+                <span class="console-title" id="console-header-title">Konzola v živo</span>
+                <button class="btn-secondary" onclick="exportLogs()">💾 Izvozi zapisnik</button>
+            </div>
+            <div id="console">Pripravljeno. Naložite ali izberite projekt za začetek spremljanja...</div>
+        </div>
+    </div>
+</div>
+
+<!-- 2. POGLED: ZGODOVINA -->
+<div id="view-history" class="app-view">
+    <div class="card" style="width: 100%; height: 100%; display: flex; flex-direction: column; box-sizing: border-box;">
+        <h2 style="margin-top: 0; font-size: 14px; color: var(--primary);">Zgodovina testiranj</h2>
+        <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 10px;">Pregled vseh preteklih izvajanj testov.</p>
+        <div style="flex: 1; overflow-y: auto;">
+            <table class="history-table">
+                <thead>
+                <tr>
+                    <th>Projekt</th>
+                    <th>Uporabnik</th>
+                    <th>Čas</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody id="global-history-body">
+                <tr><td colspan="4" style="text-align:center; color:var(--text-muted);">Ni podatkov o zgodovini.</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 3. POGLED: NASTAVITVE -->
+<div id="view-settings" class="app-view" style="justify-content: center; align-items: center;">
+    <div class="card" style="width: 600px; max-width: 90%; display: flex; flex-direction: column; box-sizing: border-box;">
+        <h2 style="margin-top: 0; font-size: 14px; color: var(--primary);">Nastavitve aplikacije</h2>
+        <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 15px;">Prilagodite jezik in videz aplikacije.</p>
+        <div style="display: flex; flex-direction: column; gap: 15px;">
+            <div class="settings-group">
+                <label>Jezik aplikacije / Application Language:</label>
+                <select class="settings-select" onchange="changeLanguage(this.value)">
+                    <option value="sl">Slovenščina</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+            <div class="settings-group">
+                <label>Izberi temo / Theme:</label>
+                <select class="settings-select" onchange="changeTheme(this.value)">
+                    <option value="default">Privzeta (Temno modra)</option>
+                    <option value="light">Svetla tema</option>
+                    <option value="emerald">Smaragdna</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 4. POGLED: POMOČ -->
+<div id="view-help" class="app-view" style="justify-content: center; align-items: center; overflow-y: auto;">
+    <div class="card" style="width: 650px; max-width: 95%; max-height: 90vh; overflow-y: auto; display: flex; flex-direction: column; box-sizing: border-box; padding: 25px;">
+        <h2 style="margin-top: 0; font-size: 16px; color: var(--primary); text-align: center;">Središče za pomoč</h2>
+        <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 20px; text-align: center;">Izberite želeno vrsto pomoči ali nam oddajte svoje povratne informacije.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+            <div onclick="startTutorial()" style="background: var(--bg-input); border: 1px solid var(--border); padding: 15px; border-radius: 8px; cursor: pointer; text-align: center; transition: 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="font-size: 22px; margin-bottom: 8px;">🧭</div>
+                <h3 style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-main);">Vodič skozi aplikacijo</h3>
+                <p style="font-size: 10px; color: var(--text-muted); margin: 0;">Zaženite interaktivni sprehod po funkcijah.</p>
+            </div>
+            <div onclick="alert('Za vsa dodatna vprašanja nam pišite na podporo ali preverite dokumentacijo.')" style="background: var(--bg-input); border: 1px solid var(--border); padding: 15px; border-radius: 8px; cursor: pointer; text-align: center; transition: 0.2s;" onmouseover="this.style.borderColor='var(--primary)'" onmouseout="this.style.borderColor='var(--border)'">
+                <div style="font-size: 22px; margin-bottom: 8px;">💡</div>
+                <h3 style="margin: 0 0 5px 0; font-size: 13px; color: var(--text-main);">Pogosta vprašanja</h3>
+                <p style="font-size: 10px; color: var(--text-muted); margin: 0;">Preglejte nasvete za hitre rešitve.</p>
+            </div>
+        </div>
+        <div style="border-top: 1px solid var(--border); padding-top: 15px;">
+            <h3 style="font-size: 13px; color: var(--primary); margin-bottom: 5px;">Oddajte mnenje ali predlog</h3>
+            <p style="font-size: 10px; color: var(--text-muted); margin-bottom: 10px;">Vaš odziv nam pomaga izboljšati aplikacijo.</p>
+            <form onsubmit="submitFeedback(event)">
+                <textarea id="user-feedback-input" placeholder="Napišite vaše mnenje ali predlog tukaj..." required style="width: 100%; height: 70px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 5px; padding: 8px; box-sizing: border-box; font-size: 11px; resize: none; margin-bottom: 10px;"></textarea>
+                <button type="submit" class="nav-auth-btn" style="width: 100%; padding: 8px; font-size: 11px;">Pošlji mnenje</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 5. POGLED: PRIJAVA -->
+<div id="view-auth" class="app-view" style="align-items: center; justify-content: center;">
+    <div class="card" style="width: 340px; text-align: center; padding: 25px;">
+        <h2 style="margin-top: 0; font-size: 14px; color: var(--primary);">Prijava v sistem</h2>
+        <p style="color: var(--text-muted); font-size: 11px; margin-bottom: 15px;">Uporabite račun za sinhronizacijo testov.</p>
+        <div id="auth-container">
+            <input type="email" placeholder="E-poštni naslov" style="width: 100%; padding: 8px; margin-bottom: 10px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 5px; box-sizing: border-box; font-size: 11px;">
+            <input type="password" placeholder="Geslo" style="width: 100%; padding: 8px; margin-bottom: 15px; background: var(--bg-input); border: 1px solid var(--border); color: var(--text-main); border-radius: 5px; box-sizing: border-box; font-size: 11px;">
+            <button class="nav-auth-btn" style="width: 100%; padding: 8px;">Prijava</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function switchView(viewId, btnElement) {
+        document.querySelectorAll('.app-view').forEach(view => {
+            view.classList.remove('active-view');
+        });
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        document.getElementById(viewId).classList.add('active-view');
+        if (btnElement && btnElement.classList.contains('nav-btn')) {
+            btnElement.classList.add('active');
+        }
+        if (viewId === 'view-history' && typeof renderGlobalHistoryTable === 'function') {
+            renderGlobalHistoryTable();
+        }
+    }
+
+    function submitFeedback(event) {
+        event.preventDefault();
+        const inputElement = document.getElementById('user-feedback-input');
+        const text = inputElement.value.trim();
+        if (!text) return;
+        const feedbackData = { message: text, timestamp: new Date().toISOString() };
+        let feedbacks = JSON.parse(localStorage.getItem('app_feedbacks') || '[]');
+        feedbacks.push(feedbackData);
+        localStorage.setItem('app_feedbacks', JSON.stringify(feedbacks));
+        inputElement.value = '';
+        alert('Hvala! Vaše mnenje je bilo uspešno shranjeno.');
+    }
+</script>
+
+<script src="tutorial.js"></script>
+<script src="renderer.js"></script>
+<script src="js/database.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/history.js"></script>
+<script src="js/settings.js"></script>
+</body>
+</html>

@@ -1,0 +1,477 @@
+:root {
+    --bg-main: #060b19;
+    --bg-card: rgba(15, 23, 42, 0.75);
+    --bg-input: rgba(30, 41, 59, 0.6);
+    --primary: #38bdf8;
+    --primary-glow: rgba(56, 189, 248, 0.4);
+    --success: #22c55e;
+    --success-glow: rgba(34, 197, 94, 0.5);
+    --danger: #ef4444;
+    --disabled: #475569;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --border: rgba(56, 189, 248, 0.2);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-main);
+    background-image:
+            radial-gradient(circle at 50% 20%, rgba(14, 116, 144, 0.2) 0%, transparent 60%),
+            linear-gradient(to bottom, #030712 0%, #0b132b 100%);
+    color: var(--text-main);
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+body::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-image: linear-gradient(to right, rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+    background-size: 30px 30px;
+    pointer-events: none;
+    z-index: -1;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 12px 25px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.nav-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.nav-links {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 6px 0;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    transition: color 0.2s;
+    position: relative;
+}
+
+.nav-btn:hover, .nav-btn.active {
+    color: var(--primary);
+}
+
+.nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary);
+    box-shadow: 0 0 8px var(--primary-glow);
+}
+
+.nav-auth-btn {
+    background: linear-gradient(135deg, var(--primary) 0%, #0284c7 100%);
+    color: #030712;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--primary-glow);
+    transition: 0.2s;
+}
+
+.nav-auth-btn:hover {
+    opacity: 0.9;
+}
+
+/* GLAVNI POGLEDI (VIEWS) */
+.app-view {
+    display: none;
+    flex: 1;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding: 16px;
+}
+
+.app-view.active-view {
+    display: flex;
+}
+
+/* DINAMIČNA POSTAVITEV (LEVI STOLPEC + DESNA KONZOLA) */
+.main-layout {
+    display: grid;
+    grid-template-columns: 440px 1fr; /* Ko je konzola skrita, se desni stolpec prilagodi */
+    gap: 16px;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    transition: grid-template-columns 0.3s ease;
+}
+
+.main-layout.no-console {
+    grid-template-columns: 1fr; /* Levi stolpec zavzame več prostora, konzola izgine */
+}
+
+/* LEVI STOLPEC: NIT / PIPELINE Z VERTIKALNO ČRTO NA SREDI */
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow-y: auto;
+    padding: 4px 10px 4px 4px;
+    position: relative;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+/* Osrednja vertikalna črta (nit) skoz celoten levi stolpec */
+.sidebar::before {
+    content: '';
+    position: absolute;
+    top: 25px;
+    bottom: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    background: linear-gradient(to bottom, var(--primary), var(--success));
+    border-radius: 2px;
+    z-index: 0;
+    box-shadow: 0 0 10px var(--primary-glow);
+}
+
+.card {
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    position: relative;
+    z-index: 2; /* Kartice so točno na sredinski črti */
+}
+
+.card h3 {
+    margin-top: 0;
+    font-size: 11px;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    font-weight: 700;
+    text-align: center; /* Naslovi lepo centrirani nad potjo */
+}
+
+#drop-zone {
+    border: 2px dashed rgba(56, 189, 248, 0.4);
+    background: rgba(56, 189, 248, 0.02);
+    padding: 12px;
+    text-align: center;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#drop-zone:hover, #drop-zone.dragover {
+    background: rgba(56, 189, 248, 0.08);
+    border-color: var(--primary);
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+#drop-zone p {
+    margin: 4px 0 0 0;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.project-item {
+    background: var(--bg-input);
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    cursor: grab;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.project-item:hover { border-color: var(--primary); background: rgba(56, 189, 248, 0.1); }
+.project-item.active { border-color: var(--primary); background: rgba(56, 189, 248, 0.2); font-weight: bold; box-shadow: 0 0 8px var(--primary-glow); }
+
+.status-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: bold;
+}
+.status-pass { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+.status-fail { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; }
+
+/* AKTIVNOST */
+#activity-drop-zone {
+    border: 2px dashed rgba(56, 189, 248, 0.3);
+    border-radius: 6px;
+    padding: 10px;
+    background: rgba(56, 189, 248, 0.02);
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 8px;
+}
+
+button {
+    padding: 6px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+}
+
+.btn-run {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);
+}
+.btn-run:hover:not(:disabled) {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    box-shadow: 0 0 12px rgba(52, 211, 153, 0.5);
+}
+.btn-run:disabled { background-color: var(--disabled); cursor: not-allowed; opacity: 0.6; box-shadow: none; }
+
+.btn-secondary {
+    background-color: var(--bg-input);
+    color: var(--text-main);
+    font-size: 10px;
+    padding: 5px 8px;
+    border: 1px solid var(--border);
+}
+.btn-secondary:hover { background-color: var(--primary); border-color: var(--primary); color: #030712; }
+
+/* PROCENTUALNI NAPREDEK */
+.progress-container {
+    background: rgba(3, 7, 18, 0.6);
+    border-radius: 5px;
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.progress-info-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: var(--bg-input);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #22c55e);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* DESNI STOLPEC: Konzola (prikazana le med testiranjem) */
+.console-card {
+    display: none; /* Privzeto skrita, dokler ni aktivnega teka */
+    flex-direction: column;
+    background: var(--bg-card);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    height: 100%;
+    box-sizing: border-box;
+    min-height: 0;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.console-card.visible {
+    display: flex; /* Prikaže se samo v stanju testiranja */
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.console-title {
+    font-size: 11px;
+    color: var(--primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+}
+
+#console {
+    background-color: #030712;
+    color: #38bdf8;
+    font-family: 'Courier New', Courier, monospace;
+    padding: 10px;
+    border-radius: 6px;
+    flex: 1;
+    overflow-y: auto;
+    font-size: 10px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    border: 1px solid rgba(56, 189, 248, 0.15);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
+    min-height: 0;
+}
+
+/* TABELARNI PRIKAZ ZGODOVINE */
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 11px;
+    text-align: left;
+}
+
+.history-table th, .history-table td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.history-table th {
+    color: var(--primary);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(56, 189, 248, 0.05);
+}
+
+.history-table tr:hover {
+    background: rgba(56, 189, 248, 0.03);
+}
+
+/* NASTAVITVE - FORMI */
+.settings-group {
+    margin-bottom: 15px;
+}
+
+.settings-group label {
+    display: block;
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+}
+
+.settings-select {
+    background: var(--bg-input);
+    color: var(--text-main);
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 11px;
+    width: 220px;
+}
+
+/* MODALNA OKNA VODIČA */
+#tutorial-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(3, 7, 18, 0.75);
+    backdrop-filter: blur(4px);
+    z-index: 9999;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.tutorial-box {
+    background: #0f172a;
+    border: 1px solid var(--primary);
+    border-radius: 12px;
+    padding: 24px;
+    width: 400px;
+    max-width: 90vw;
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.3);
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.tutorial-box h2 {
+    margin-top: 0;
+    font-size: 15px;
+    color: var(--primary);
+}
+
+.tutorial-box p {
+    font-size: 11px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.tutorial-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.highlighted-element {
+    position: relative;
+    z-index: 10000 !important;
+    box-shadow: 0 0 20px var(--primary), inset 0 0 10px rgba(56, 189, 248, 0.4) !important;
+    border-color: var(--primary) !important;
+    background-color: rgba(15, 23, 42, 0.95) !important;
+    border-radius: 8px;
+}
+
+.settings-container, .help-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}

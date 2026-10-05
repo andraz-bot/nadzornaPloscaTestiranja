@@ -1,0 +1,35 @@
+{
+  "name": "testni-vmesnik",
+  "version": "1.0.0",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win portable"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2",
+    "adm-zip": "^0.5.10",
+    "dotenv": "^18.0.5"
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^26.15.3"
+  },
+  "build": {
+    "appId": "com.testrunner.app",
+    "productName": "TestniVmesnik",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      ".env"
+    ],
+    "win": {
+      "icon": "icon.ico"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.exe"
+    }
+  }
+}
